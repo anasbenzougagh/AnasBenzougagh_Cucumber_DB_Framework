@@ -1,14 +1,8 @@
-package steps;
+package com.steps;
 
-
-
-
-import com.library.utility.ConfigurationReader;
-import com.library.utility.DB_Util;
-import com.library.utility.Driver;
+import com.utility.DB_Util;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
-import utility.DB_Util;
 
 
 public class Hooks {
