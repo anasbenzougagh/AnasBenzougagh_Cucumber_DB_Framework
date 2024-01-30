@@ -38,9 +38,12 @@ public class DB_Util {
      * Create connection method , just checking one connection successful or not
      */
     public static void createConnection() {
+        //Configuration not working probably for slight delay
+
         String url = ConfigurationReader.getProperty("db.url");
         String username = ConfigurationReader.getProperty("db.username");
         String password = ConfigurationReader.getProperty("db.password");
+
 
         createConnection(url, username, password);
     }
@@ -106,8 +109,8 @@ public class DB_Util {
 
         int rowCount = 0;
         try {
-            rs.last();
-            rowCount = rs.getRow();
+            rs.last();                  //move to last row
+            rowCount = rs.getRow();     //assign row number to this variable
         } catch (Exception e) {
             System.out.println("ERROR OCCURRED WHILE GETTING ROW COUNT " + e.getMessage());
         } finally {
@@ -166,6 +169,7 @@ public class DB_Util {
 
     /**
      * Getting entire row of data in a List of String
+     *
      * @param rowNum row number to get as a list
      * @return row data as List of String
      */
