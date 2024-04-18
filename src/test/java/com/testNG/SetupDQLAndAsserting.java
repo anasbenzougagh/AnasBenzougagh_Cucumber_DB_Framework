@@ -1,13 +1,11 @@
 package com.junit;
 
 import com.utility.DB_Util;
-import org.junit.Before;
-import org.junit.Test;
 
 import java.sql.*;
 import java.util.*;
 
-public class JUnitTestReview {
+public class JUnitDBTestReview {
 
     //Connection required String:
     String dbURL = "jdbc:oracle:thin:@52.87.197.190:1521:XE";
@@ -18,9 +16,9 @@ public class JUnitTestReview {
     public void introJDBC() throws SQLException {
         //Get connection needs SQLException to use getConnection
         /** Main interfaces:
-         1-Connection : use DriverManager getConnection method to establish connection passing URL,Username and password args.
-         2-Statement : once connected use connection to created statement (then set limitation to the statement).
-         3-ResultSet : once execute query method is initiated you can pass query then store in a resultSet variable.
+         1-Connection: use DriverManager getConnection method to establish connection passing URL, Username and password args.
+         2-Statement: once connected, use connection to a created statement (then set limitation to the statement).
+         3-ResultSet: once execute query method is initiated, you can pass a query then store in a resultSet variable.
          */
         //Creating connection
         Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
