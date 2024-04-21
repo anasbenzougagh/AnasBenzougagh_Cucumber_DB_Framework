@@ -4,7 +4,6 @@ import com.utility.ConfigurationReader;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import org.junit.jupiter.api.Assertions;
 
 import java.sql.*;
 import java.util.HashMap;
