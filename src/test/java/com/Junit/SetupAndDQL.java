@@ -1,16 +1,16 @@
-package com.junit;
+package com.Junit;
 
-import com.utility.DB_Util;
+import org.junit.jupiter.api.Test;
 
 import java.sql.*;
 import java.util.*;
 
-public class JUnitDBTestReview {
+public class SetupAndDQL {
 
     //Connection required String:
-    String dbURL = "jdbc:oracle:thin:@52.87.197.190:1521:XE";
-    String dbUsername = "hr";
-    String dbPassword = "hr";
+    String dbURL = "jdbc:sqlite:src/test/resources/northwind.db";
+    String dbUsername = "";
+    String dbPassword = "";
 
     @Test
     public void introJDBC() throws SQLException {
@@ -24,29 +24,29 @@ public class JUnitDBTestReview {
         Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
 
         //To execute queries
-        //Statement statement = connection.createStatement();
-        Statement statement = connection.createStatement(
-                ResultSet.TYPE_SCROLL_INSENSITIVE,  //means that result set is scrollable
-                ResultSet.CONCUR_READ_ONLY);        //means that result set is readable only
+        Statement statement = connection.createStatement();
 
-        //This holds statement value after execute
+        //resultSet holds statement value after execute
         ResultSet resultSet = statement.executeQuery("select * from EMPLOYEES");
 
-        //extracting data from table as long there is a row
+        //extracting data from table while there is a row
         while (resultSet.next()) {
+            System.out.println("----------------------------------------------------------");
             System.out.println(
                     //return will match getValue
-                    resultSet.getString("EMAIL")
-                            + "-" +
+                    resultSet.getString("TitleOfCourtesy")
+                            + " " +
+                            resultSet.getString("FirstName")
+                            + " " +
+                            resultSet.getString("LastName")
+                            + "\n" +
+                            resultSet.getString("Country")
+                            + " [" +
                             resultSet.getString(4)
-                            + "-\n" +
-                            resultSet.getInt("EMPLOYEE_ID")
-                            + "-" +
-                            resultSet.getInt(1)
+                            + "] Extension: " +
+                            resultSet.getInt("Extension")
             );
         }
-
-
         connection.close();
         statement.close();
         resultSet.close();
@@ -56,51 +56,47 @@ public class JUnitDBTestReview {
     public void basicNavigation() throws SQLException {
         Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
 
-        //ResultSet.TYPE_SCROLL_INSENSITIVE   --> to do flexible navigation between rows
-        //ResultSet.CONCUR_READ_ONLY          --> do not update anything form DB, only display
-        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE
-                , ResultSet.CONCUR_READ_ONLY);
+        Statement statement = connection.createStatement();
 
-        ResultSet resultSet = statement.executeQuery("SELECT FIRST_NAME, LAST_NAME FROM EMPLOYEES");
+        ResultSet resultSet = statement.executeQuery("SELECT LastName, FirstName FROM EMPLOYEES");
 
-        //Get first row ----
-        //rs.next(); ==> used to move to first row after metadata.
+        //rs.next(); ==> used to move to the first row after metadata.
         resultSet.next();
         System.out.println("First Row");
-        System.out.println(resultSet.getString("FIRST_NAME") + " - " + resultSet.getString(2));
+        System.out.println(resultSet.getString("FirstName") + " - " + resultSet.getString(2));
 
         //Get second row ----
         resultSet.next();
         System.out.println("Second Row");
-        System.out.println(resultSet.getString("FIRST_NAME") + " - " + resultSet.getString(2));
+        System.out.println(resultSet.getString("FirstName") + " - " + resultSet.getString(2));
 
-        //Get last row ---
-        resultSet.last();
-        System.out.println("Last Row");
-        System.out.println(resultSet.getString("FIRST_NAME") + " - " + resultSet.getString(2));
+        //Get the last row ---
+        //resultSet.last();
+        //System.out.println("Last Row");
+        //System.out.println(resultSet.getString("FirstName") + " - " + resultSet.getString(2));
 
-        //Get row number
+        //Get row number (works with non TYPE_FORWARD_ONLY Databases)
         int rowNumber = resultSet.getRow();
         System.out.println("Row Number");
         System.out.println(rowNumber);
 
-        //Get row by number
-        System.out.println("Absolute");
-        resultSet.absolute(40);
-        System.out.println(resultSet.getString("FIRST_NAME") + " - " + resultSet.getString(2));
+        //Get row by number (works with non TYPE_FORWARD_ONLY Databases)
+        //System.out.println("Absolute");
+        //resultSet.absolute(5);
+        //System.out.println(resultSet.getString("FirstName") + " - " + resultSet.getString(2));
 
         //Get previous row
-        System.out.println("Previous");
-        resultSet.previous();
-        System.out.println(resultSet.getRow());
-        System.out.println(resultSet.getString("FIRST_NAME") + " - " + resultSet.getString(2));
+        //System.out.println("Previous");
+        //resultSet.previous();
+        //System.out.println(resultSet.getRow());
+        //System.out.println(resultSet.getString("FirstName") + " - " + resultSet.getString(2));
 
-        //Task print the whole table
+        //To print the whole table
         System.out.println("Loop");
         //resultSet.absolute(0);
-        resultSet.beforeFirst();
+        //resultSet.beforeFirst();
         while (resultSet.next()) {
-            System.out.println(resultSet.getString("FIRST_NAME") + " - " + resultSet.getString(2));
+            System.out.println(resultSet.getString("FirstName") + " - " + resultSet.getString(2));
         }
         connection.close();
         statement.close();
@@ -110,38 +106,46 @@ public class JUnitDBTestReview {
     @Test
     public void metaData() throws SQLException {
         Connection conn = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
-        Statement statement = conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        ResultSet rs = statement.executeQuery(""
-                + "SELECT FIRST_NAME,LAST_NAME,SALARY FROM EMPLOYEES WHERE ROWNUM<6"
-                + "");
+        Statement statement = conn.createStatement(
+                //ResultSet.TYPE_SCROLL_INSENSITIVE,
+                //ResultSet.CONCUR_READ_ONLY
+        );
+        ResultSet rs = statement.
+                executeQuery("SELECT FirstName,LastName,Title FROM employees Limit 6");
 
         //Getting database metadata
         System.out.println("Getting database metadata");
         DatabaseMetaData dbMetaData = conn.getMetaData();
+        System.out.println("-----------------------------------------");
         System.out.println("dbMetaData = " + dbMetaData);
         System.out.println(dbMetaData.getUserName());
         System.out.println(dbMetaData.getDatabaseProductName());
         System.out.println(dbMetaData.getDatabaseProductVersion());
         System.out.println(dbMetaData.getDriverName());
+        System.out.println("-----------------------------------------");
 
         //Getting resultSetMetadata
         System.out.println("Getting resultSetMetadata");
         ResultSetMetaData rsmd = rs.getMetaData();
+        System.out.println("-----------------------------------------");
 
         //Get number of columns
         System.out.println(".getColumnCount");
         int columnCount = rsmd.getColumnCount();
         System.out.println(columnCount);
+        System.out.println("-----------------------------------------");
 
         //Get column name
         System.out.println(".getColumnName");
         System.out.println(rsmd.getColumnName(2));
+        System.out.println("-----------------------------------------");
 
         //Get all column names
         System.out.println("Print all columns");
         for (int i = 1; i <= rsmd.getColumnCount(); i++) {
             System.out.print(rsmd.getColumnName(i) + " ");
         }
+        System.out.println("-----------------------------------------");
 
 
         //ResultSet                               ==> holds table data
@@ -157,8 +161,9 @@ public class JUnitDBTestReview {
         System.out.println("Print ALL Data Dynamically");
         //Write a code, that prints whole table information for every query
         //Column Name - Column Value
-        //EMPLOYEE_ID - 100
-        //FIRST_NAME - Steven
+        //FirstName - Margaret
+        //LastName - Peacock
+        //Title - Sales Representative
 
         while (rs.next()) {
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
@@ -176,16 +181,19 @@ public class JUnitDBTestReview {
     @Test
     public void storingDBDataInListOfMaps() throws SQLException {
         Connection connection = DriverManager.getConnection(dbURL, dbUsername, dbPassword);
-        Statement statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
-        ResultSet rs = statement.executeQuery(""
-                + "SELECT FIRST_NAME,LAST_NAME,SALARY FROM EMPLOYEES WHERE ROWNUM<6"
-                + "");
+        Statement statement = connection.createStatement(
+                //ResultSet.TYPE_SCROLL_INSENSITIVE,
+                //ResultSet.CONCUR_READ_ONLY
+        );
+
+        ResultSet rs = statement
+                .executeQuery("SELECT FirstName,LastName,Title FROM employees Limit 6");
 
         //Storing data dynamically
         ResultSetMetaData rsmd = rs.getMetaData();
         List<Map<String, Object>> dataList = new ArrayList<>();
 
-        //Number of column number
+        //Number of column numbers
         int columnCount = rsmd.getColumnCount();
 
         //iterating through each row
@@ -208,44 +216,5 @@ public class JUnitDBTestReview {
         connection.close();
         statement.close();
         rs.close();
-    }
-
-    @Test
-    public void DBUtils() {
-        //create a connection
-        //DB_Util.createConnection(dbURL,dbUsername,dbPassword);
-        DB_Util.createConnection();
-
-        //run query
-        DB_Util.runQuery("SELECT FIRST_NAME,LAST_NAME,SALARY FROM EMPLOYEES");
-
-        //get result
-        System.out.println("=====Get ME First Row First Column=====");
-        System.out.println(DB_Util.getFirstRowFirstColumn());
-
-        System.out.println("=====Get ME All Column=====");
-        System.out.println(DB_Util.getAllColumnNamesAsList());
-
-        System.out.println("=====Get ME All First Names=====");
-        System.out.println(DB_Util.getColumnDataAsList(1));
-
-        System.out.println("=====Get ME Rows Number=====");
-        System.out.println(DB_Util.getRowCount());
-
-        System.out.println("=====Get ME Specific Row Info=====");
-        System.out.println("=====Get ME AS MAP=====");
-        System.out.println(DB_Util.getRowMap(1));
-
-        System.out.println("=====Get ME ALL DATA AS LIST OF MAP=====");
-        System.out.println(DB_Util.getRowDataAsList(2));
-
-        List<Map<String, Object>> allRowAsListOfMap = DB_Util.getAllRowAsListOfMap();
-
-        for (Map<String, Object> rowMap : allRowAsListOfMap) {
-            System.out.println(rowMap);
-        }
-
-        //close the connection
-        DB_Util.destroy();
     }
 }

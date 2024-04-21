@@ -13,7 +13,7 @@ import org.junit.runner.RunWith;
                 "me.jvt.cucumber.report.PrettyReports:target/cucumber",
                 "json:target/cucumber.json"
         },
-        features = "src/test/resources/features" ,
+        features = "src/test/resources" ,
         glue = "com/library/steps",
         dryRun = false,
         tags = "@db"
